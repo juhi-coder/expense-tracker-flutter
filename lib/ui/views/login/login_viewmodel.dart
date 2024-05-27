@@ -12,7 +12,7 @@ class LoginViewModel extends BaseViewModel {
     setBusy(true);
 
     if (await _apiService.login(email, password)) {
-      _navigationService.clearStackAndShow(Routes.homeView);
+      _navigationService.clearStackAndShow(Routes.expenseView);
     }
     setBusy(false);
   }

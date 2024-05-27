@@ -95,4 +95,68 @@ class ApiService {
       throw Exception('failed to load data');
     }
   }
+
+  Future<bool> updateExpense(
+      int id, String name, String category, dynamic amount) async {
+    final response = await http.put(Uri.parse('$url/expenses/edit/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'name': name,
+          'category': category,
+          'amount': amount
+        }));
+    if (response.statusCode == 200) {
+      await _dialogService.showDialog(
+          title: 'Success',
+          description: 'Updated successfully',
+          buttonTitle: 'ok');
+      return true;
+    } else {
+      final responseBody = jsonDecode(response.body);
+      await _dialogService.showDialog(
+        title: 'Error',
+        description: responseBody['message'] ?? 'Failed to Update expenses',
+        buttonTitle: 'OK',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> deleteExpense(int id) async {
+    final response = await http.delete(
+      Uri.parse('$url/expenses/delete/$id'),
+    );
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<dynamic> createOrder(
+      dynamic amount, dynamic currency, dynamic receipt) async {
+    final response = await http.post(Uri.parse('$url/payment/create-order'),
+        headers: <String, String>{
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'amount': amount,
+          'currency': currency,
+          'receipt': receipt
+        }));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      final responseBody = jsonDecode(response.body);
+      await _dialogService.showDialog(
+        title: 'Error',
+        description: responseBody['message'] ?? 'Failed to create order',
+        buttonTitle: 'OK',
+      );
+      return null;
+    }
+  }
 }

@@ -53,8 +53,14 @@ class StackedRouter extends _i1.RouterBase {
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
     _i2.HomeView: (data) {
+      final args = data.getArgs<HomeViewArguments>(nullOk: false);
       return _i6.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i2.HomeView(),
+        builder: (context) => _i2.HomeView(
+            key: args.key,
+            expanseId: args.expanseId,
+            intialName: args.intialName,
+            intialCategory: args.intialCategory,
+            intialAmount: args.intialAmount),
         settings: data,
       );
     },
@@ -85,15 +91,70 @@ class StackedRouter extends _i1.RouterBase {
   Map<Type, _i1.StackedRouteFactory> get pagesMap => _pagesMap;
 }
 
+class HomeViewArguments {
+  const HomeViewArguments({
+    this.key,
+    required this.expanseId,
+    this.intialName,
+    this.intialCategory,
+    this.intialAmount,
+  });
+
+  final _i6.Key? key;
+
+  final int? expanseId;
+
+  final String? intialName;
+
+  final String? intialCategory;
+
+  final int? intialAmount;
+
+  @override
+  String toString() {
+    return '{"key": "$key", "expanseId": "$expanseId", "intialName": "$intialName", "intialCategory": "$intialCategory", "intialAmount": "$intialAmount"}';
+  }
+
+  @override
+  bool operator ==(covariant HomeViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key &&
+        other.expanseId == expanseId &&
+        other.intialName == intialName &&
+        other.intialCategory == intialCategory &&
+        other.intialAmount == intialAmount;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode ^
+        expanseId.hashCode ^
+        intialName.hashCode ^
+        intialCategory.hashCode ^
+        intialAmount.hashCode;
+  }
+}
+
 extension NavigatorStateExtension on _i7.NavigationService {
-  Future<dynamic> navigateToHomeView([
+  Future<dynamic> navigateToHomeView({
+    _i6.Key? key,
+    required int? expanseId,
+    String? intialName,
+    String? intialCategory,
+    int? intialAmount,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return navigateTo<dynamic>(Routes.homeView,
+        arguments: HomeViewArguments(
+            key: key,
+            expanseId: expanseId,
+            intialName: intialName,
+            intialCategory: intialCategory,
+            intialAmount: intialAmount),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -142,14 +203,25 @@ extension NavigatorStateExtension on _i7.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> replaceWithHomeView([
+  Future<dynamic> replaceWithHomeView({
+    _i6.Key? key,
+    required int? expanseId,
+    String? intialName,
+    String? intialCategory,
+    int? intialAmount,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  ]) async {
+  }) async {
     return replaceWith<dynamic>(Routes.homeView,
+        arguments: HomeViewArguments(
+            key: key,
+            expanseId: expanseId,
+            intialName: intialName,
+            intialCategory: intialCategory,
+            intialAmount: intialAmount),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

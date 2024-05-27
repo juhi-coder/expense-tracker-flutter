@@ -3,7 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  const HomeView(
+      {super.key,
+      required this.expanseId,
+      this.intialName,
+      this.intialCategory,
+      this.intialAmount});
+  final int? expanseId;
+  final String? intialName;
+  final String? intialCategory;
+  final int? intialAmount;
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -19,6 +28,15 @@ class _HomeViewState extends State<HomeView> {
   TextEditingController nameController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
   TextEditingController amountController = TextEditingController();
+  bool get isUpdating => widget.expanseId != null;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController.text = widget.intialName ?? '';
+    categoryController.text = widget.intialCategory ?? '';
+    amountController.text = widget.intialAmount?.toString() ?? '';
+  }
 
   @override
   void dispose() {
@@ -126,6 +144,7 @@ class _HomeViewState extends State<HomeView> {
                             }),
                         const SizedBox(height: 20),
                         TextFormField(
+                            controller: categoryController,
                             decoration: InputDecoration(
                                 hintText: 'category',
                                 border: OutlineInputBorder(
@@ -140,6 +159,7 @@ class _HomeViewState extends State<HomeView> {
                             }),
                         const SizedBox(height: 20),
                         TextFormField(
+                            controller: amountController,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                                 hintText: 'amount',
@@ -167,11 +187,21 @@ class _HomeViewState extends State<HomeView> {
                             onPressed: () {
                               if (formkey.currentState!.validate()) {
                                 formkey.currentState!.save();
-                                viewmodel.postExpenses(
-                                    name!, category!, amount!);
+                                if (isUpdating) {
+                                  viewmodel.updateExpense(
+                                      widget.expanseId!,
+                                      nameController.text,
+                                      categoryController.text,
+                                      amountController.text);
+                                } else {
+                                  viewmodel.postExpenses(
+                                      name!, category!, amount!);
+                                }
                               }
                             },
-                            child: const Text('submit'))
+                            child: isUpdating
+                                ? const Text('Update')
+                                : const Text('submit'))
                       ],
                     ),
                   )),
