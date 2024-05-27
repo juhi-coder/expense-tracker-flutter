@@ -11,8 +11,11 @@ class HomeViewModel extends BaseViewModel {
   final _dialogService = DialogService();
   Razorpay? _razorpay;
 
+  List<dynamic> filterUsers = [];
+  List<dynamic> users = [];
   void init() {
     getExpenses();
+    filterUsers = users;
     _razorpay = Razorpay();
     _razorpay?.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay?.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
@@ -30,14 +33,14 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<List<dynamic>> getExpenses() async {
-    return await _apiService.getExpenses();
+    users = await _apiService.getExpenses();
+    return users;
   }
 
   Future<void> updateExpense(
       int id, String name, String category, dynamic amount) async {
     setBusy(true);
     if (await _apiService.updateExpense(id, name, category, amount)) {
-      // Update the list of expenses stored in the view model
       await getExpenses();
       _navigationService.navigateTo(Routes.expenseView);
       notifyListeners();
@@ -77,8 +80,7 @@ class HomeViewModel extends BaseViewModel {
         timeInSecForIosWeb: 6);
   }
 
-  Future<void> makePayment(
-      dynamic amount, dynamic currency, dynamic receipt) async {
+  Future<void> makePayment(int amount, String currency, String receipt) async {
     var orderResponse =
         await _apiService.createOrder(amount, currency, receipt);
     try {
@@ -91,5 +93,19 @@ class HomeViewModel extends BaseViewModel {
       Fluttertoast.showToast(
           msg: 'ERRORT:${e.toString()}', timeInSecForIosWeb: 6);
     }
+  }
+
+  void searchExpenses(String query) {
+    if (query.isEmpty) {
+      filterUsers = List.from(users);
+    } else {
+      filterUsers = users.where((expense) {
+        final name = expense['name'].toString().toLowerCase();
+        final category = expense['category'].toString().toLowerCase();
+        return name.contains(query.toLowerCase()) ||
+            category.contains(query.toLowerCase());
+      }).toList();
+    }
+    notifyListeners();
   }
 }
